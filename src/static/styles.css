@@ -57,6 +57,42 @@ section h3 {
   color: #1a237e;
 }
 
+#account-container {
+  max-width: 500px;
+}
+
+#account-profile {
+  overflow-wrap: anywhere;
+}
+
+#profile-summary {
+  margin-bottom: 12px;
+}
+
+#profile-memberships h4 {
+  margin-bottom: 8px;
+  color: #1a237e;
+}
+
+#profile-memberships ul {
+  margin: 0 0 16px 20px;
+}
+
+.registration-details {
+  margin-top: 16px;
+}
+
+.registration-details summary {
+  color: #1a237e;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.registration-details[open] summary {
+  margin-bottom: 16px;
+}
+
 .activity-card {
   margin-bottom: 15px;
   padding: 15px;
@@ -147,6 +183,32 @@ section h3 {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 12px;
+  }
+
+  header {
+    padding: 16px 12px;
+  }
+
+  main {
+    gap: 16px;
+  }
+
+  section {
+    padding: 16px;
+  }
+
+  .participants-section ul li {
+    align-items: flex-start;
+  }
+
+  .participant-email {
+    overflow-wrap: anywhere;
+  }
 }
 
 button {

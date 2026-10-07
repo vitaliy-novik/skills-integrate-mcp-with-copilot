@@ -1,50 +1,81 @@
 # Mergington High School Activities API
 
-A super simple FastAPI application that allows students to view and sign up for extracurricular activities.
+A FastAPI application for browsing extracurricular activities, registering
+students, and viewing student and advisor profiles.
 
-## Features
+## Getting started
 
-- View all available extracurricular activities
-- Sign up for activities
+Install dependencies from the repository root:
 
-## Getting Started
+```bash
+pip install -r requirements.txt
+```
 
-1. Install the dependencies:
+Start the API from the repository root:
 
-   ```
-   pip install fastapi uvicorn
-   ```
+```bash
+python src/app.py
+```
 
-2. Run the application:
+Open http://localhost:8000/ for the web interface, or
+http://localhost:8000/docs for the API documentation.
 
-   ```
-   python app.py
-   ```
+## Persistent data
 
-3. Open your browser and go to:
-   - API documentation: http://localhost:8000/docs
-   - Alternative documentation: http://localhost:8000/redoc
+The application creates `src/activities.sqlite3` on first start, seeds it with
+the sample activities and participants, and keeps activity and account data
+across restarts. To use another location, set `ACTIVITY_DATABASE_PATH` to the
+SQLite file path before starting the app.
 
-## API Endpoints
+The initial schema is created automatically. It contains:
 
-| Method | Endpoint                                                          | Description                                                         |
-| ------ | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
-| GET    | `/activities`                                                     | Get all activities with their details and current participant count |
-| POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Sign up for an activity                                             |
+- `activities` for names, descriptions, schedules, capacity, and display order.
+- `students` and `advisors` for account details and password hashes.
+- `activity_participants` for student activity memberships.
+- `advisor_assignments` for advisor/activity relationships and positions.
+- `app_metadata` to ensure sample participants are seeded only once.
 
-## Data Model
+The former application kept data in Python memory, so there is no old database
+to migrate. For future schema changes, apply a versioned SQL migration before
+deploying the updated application; avoid deleting the SQLite file, since it
+contains the persisted activity and account records.
 
-The application uses a simple data model with meaningful identifiers:
+Student accounts are created from the web page. There is no public advisor
+registration; an authorized operator creates advisor accounts and assigns them
+to activities from the repository root:
 
-1. **Activities** - Uses activity name as identifier:
+```bash
+python src/manage_advisors.py create --email advisor@mergington.edu --name "Casey Advisor"
+python src/manage_advisors.py assign --email advisor@mergington.edu --activity "Chess Club" --position "Faculty Advisor"
+```
 
-   - Description
-   - Schedule
-   - Maximum number of participants allowed
-   - List of student emails who are signed up
+The create command prompts for the advisor password without echoing it. To
+replace a forgotten password:
 
-2. **Students** - Uses email as identifier:
-   - Name
-   - Grade level
+```bash
+python src/manage_advisors.py reset-password --email advisor@mergington.edu
+```
 
-All data is stored in memory, which means data will be reset when the server restarts.
+Passwords are stored as salted PBKDF2-HMAC-SHA256 hashes. Set `SESSION_SECRET`
+to a long random secret in deployment so signed sessions remain valid across
+application restarts. Without it, the app generates a process-local secret,
+which invalidates existing sessions on restart. When serving the site over
+HTTPS, set `COOKIE_SECURE=true` to mark the session cookie Secure.
+
+## API endpoints
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/activities` | List persisted activities and their participant email addresses |
+| `POST` | `/activities/{activity_name}/signup?email=...` | Sign up an email for an activity |
+| `DELETE` | `/activities/{activity_name}/unregister?email=...` | Remove an email from an activity |
+| `POST` | `/auth/students/register` | Create a student account and sign in |
+| `POST` | `/auth/login` | Sign in as a student or provisioned advisor |
+| `POST` | `/auth/logout` | Clear the session cookie |
+| `GET` | `/account` | Get the signed-in user's profile and memberships |
+
+Student profiles show the student's name, email, grade, and activity
+memberships. Advisor profiles show provisioned club/activity assignments and
+positions. Existing activity signup and unregister endpoints remain available
+by email; restricting those actions to authenticated roles remains separate
+from account/profile support.
