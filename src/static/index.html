@@ -13,6 +13,58 @@
     </header>
 
     <main>
+      <section id="account-container">
+        <h3>Student and Advisor Accounts</h3>
+        <div id="account-forms">
+          <form id="login-form">
+            <div class="form-group">
+              <label for="account-role">Account type:</label>
+              <select id="account-role" required>
+                <option value="student">Student</option>
+                <option value="advisor">Advisor</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="account-email">Email:</label>
+              <input type="email" id="account-email" required autocomplete="username" />
+            </div>
+            <div class="form-group">
+              <label for="account-password">Password:</label>
+              <input type="password" id="account-password" required autocomplete="current-password" />
+            </div>
+            <button type="submit">Sign In</button>
+          </form>
+          <details class="registration-details">
+            <summary>Create a student account</summary>
+            <form id="registration-form">
+              <div class="form-group">
+                <label for="student-name">Name:</label>
+                <input type="text" id="student-name" required maxlength="120" autocomplete="name" />
+              </div>
+              <div class="form-group">
+                <label for="student-email">Email:</label>
+                <input type="email" id="student-email" required maxlength="254" autocomplete="email" />
+              </div>
+              <div class="form-group">
+                <label for="student-grade">Grade:</label>
+                <input type="text" id="student-grade" required maxlength="32" />
+              </div>
+              <div class="form-group">
+                <label for="student-password">Password (at least 8 characters):</label>
+                <input type="password" id="student-password" required minlength="8" maxlength="256" autocomplete="new-password" />
+              </div>
+              <button type="submit">Register</button>
+            </form>
+          </details>
+        </div>
+        <div id="account-profile" class="hidden">
+          <p id="profile-summary"></p>
+          <div id="profile-memberships"></div>
+          <button id="logout-button" type="button">Sign Out</button>
+        </div>
+        <div id="account-message" class="message hidden" role="status" aria-live="polite"></div>
+      </section>
+
       <section id="activities-container">
         <h3>Available Activities</h3>
         <div id="activities-list">
